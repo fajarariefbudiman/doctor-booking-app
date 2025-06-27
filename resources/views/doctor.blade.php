@@ -1,21 +1,28 @@
 <x-layouts.main>
-    <div class="max-w-xl mx-auto h-screen bg-white overflow-hidden">
 
-        <!-- TOP NAVBAR DESKTOP ONLY -->
-        <nav class="hidden md:flex justify-between items-center px-6 py-4 bg-white shadow font-poppins">
-            <div class="text-lg font-bold text-[#166FC1]">RSIA Selaras</div>
-            <div class="flex space-x-6 text-sm">
-                <a href="{{ route('home') }}" class="text-[#166FC1] hover:underline">Home</a>
-                <a href="{{ route('doctors.index') }}" class="text-[#166FC1] hover:underline">Doctors</a>
-                <a href="{{ route('bookings.index') }}" class="text-[#166FC1] hover:underline">Riwayat</a>
-                @guest
-                    <a href="{{ route('login') }}" class="text-[#166FC1] hover:underline">Login</a>
-                @else
-                    <a href="{{ route('profile.edit') }}" class="text-[#166FC1] hover:underline">Profil</a>
-                @endguest
-            </div>
-        </nav>
+    {{-- Top Navigation Bar (Desktop Only) --}}
+    <nav
+        class="hidden md:flex justify-between items-center bg-white px-6 py-4 shadow-md font-poppins border-b border-gray-200">
+        <a href="{{ route('home') }}" class="text-lg font-bold text-[#236EB3]">Selaras</a>
+        <div class="flex gap-6 text-sm font-medium">
+            <a href="{{ route('home') }}"
+                class="{{ request()->routeIs('home') ? 'text-[#236EB3]' : 'text-gray-600 hover:text-[#236EB3]' }}">Home</a>
+            <a href="{{ route('doctors.index') }}"
+                class="{{ request()->routeIs('doctors.*') ? 'text-[#236EB3]' : 'text-gray-600 hover:text-[#236EB3]' }}">Doctors</a>
+            <a href="{{ route('about') }}"
+                class="{{ request()->routeIs('about') ? 'text-[#236EB3]' : 'text-gray-600 hover:text-[#236EB3]' }}">About</a>
+            @auth
+                <a href="{{ route('profile.edit') }}"
+                    class="{{ request()->routeIs('profile.edit') ? 'text-[#236EB3]' : 'text-gray-600 hover:text-[#236EB3]' }}">Profile</a>
+            @else
+                <a href="{{ route('login') }}"
+                    class="{{ request()->routeIs('login') ? 'text-[#236EB3]' : 'text-gray-600 hover:text-[#236EB3]' }}">Login</a>
+            @endauth
+        </div>
+    </nav>
 
+    <!-- Mobile Layout (unchanged) -->
+    <div class="md:hidden max-w-xl mx-auto h-screen bg-white">
         <!-- CATEGORY SCROLL -->
         <div class="px-4 py-4 overflow-x-auto">
             <div class="flex gap-3 snap-x snap-mandatory w-max">
@@ -41,11 +48,10 @@
             </div>
         </div>
 
-
         <!-- Search Bar -->
-        <div class="flex items-center gap-2 px-4 pb-4 my-5">
+        <div class="flex items-center pb-4 my-5 px-4">
             <div class="flex flex-1 items-center px-4 rounded-full bg-[#EDEDED] shadow-sm">
-                <!-- Search Icon (Updated) -->
+                <!-- Search Icon -->
                 <svg class="w-5 h-5 text-[#166FC1E5] mr-3 shrink-0" xmlns="http://www.w3.org/2000/svg" width="25"
                     height="25" viewBox="0 0 25 25">
                     <path
@@ -57,7 +63,7 @@
                 <input type="text" placeholder="Search"
                     class="flex-1 bg-transparent border-0 text-center text-[#166FC1E5] text-lg placeholder-[#166FC1E5] focus:outline-none focus:ring-0" />
 
-                <!-- Filter Button (Updated) -->
+                <!-- Filter Button -->
                 <button class="bg-[#EDEDED] p-3 rounded-full hover:bg-gray-300 transition-colors">
                     <svg class="w-5 h-5 text-[#166FC1E5]" xmlns="http://www.w3.org/2000/svg" width="25"
                         height="25" viewBox="0 0 25 25" fill="none">
@@ -69,9 +75,8 @@
             </div>
         </div>
 
-
-        <!-- Dokter Cards -->
-        <div class="space-y-5 px-5 pb-6">
+        <!-- Dokter Cards Mobile -->
+        <div class="space-y-5 px-5 pb-28">
             @foreach ($doctors as $doctor)
                 <a href="{{ route('schedules.show', ['doctor' => $doctor->id]) }}" class="block">
                     <div class="flex items-center gap-4 border-b border-blue-400 pb-4">
@@ -95,12 +100,121 @@
             @endforeach
         </div>
 
-
-
         <!-- BOTTOM NAVBAR -->
         <x-button-nav />
+    </div>
+
+    <!-- Desktop Layout -->
+    <div class="hidden md:block">
 
 
+        <div class="bg-gradient-to-br from-blue-50 to-white min-h-screen">
+            <div class="max-w-7xl mx-auto px-6 py-8">
+
+                <!-- Search and Filter Section -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
+                        <!-- Search Bar -->
+                        <div class="flex-1">
+                            <div
+                                class="flex items-center px-6 py-4 rounded-2xl bg-gray-50 border border-gray-200 focus-within:border-[#166FC1] focus-within:ring-2 focus-within:ring-[#166FC1]/20 transition-all">
+                                <svg class="w-6 h-6 text-[#166FC1] mr-4 shrink-0" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <input type="text" placeholder="Search doctors by name or specialty..."
+                                    class="flex-1 bg-transparent border-0 text-gray-700 text-lg placeholder-gray-500 focus:outline-none focus:ring-0" />
+                            </div>
+                        </div>
+
+                        <!-- Filter Button -->
+                        <button
+                            class="bg-[#166FC1] text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                            </svg>
+                            <span class="font-semibold">Filters</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-poppins font-semibold text-gray-800 mb-4">Specialties</h3>
+                    <div class="flex flex-wrap gap-3">
+                        @php
+                            $categories = [
+                                'Semua',
+                                'Anak',
+                                'Kandungan',
+                                'Penyakit Dalam',
+                                'Orthopedi',
+                                'Kulit',
+                                'Gigi',
+                                'Umum',
+                            ];
+                        @endphp
+
+                        @foreach ($categories as $cat)
+                            <button
+                                class="px-6 py-3 text-sm font-medium rounded-full border-2 border-[#166FC1] text-[#166FC1] hover:bg-[#166FC1] hover:text-white transition-all duration-300 {{ $cat === 'Semua' ? 'bg-[#166FC1] text-white' : '' }}">
+                                {{ $cat }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Doctors Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach ($doctors as $doctor)
+                        <a href="{{ route('schedules.show', ['doctor' => $doctor->id]) }}" class="group block">
+                            <div
+                                class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100 group-hover:border-[#166FC1]/30 group-hover:-translate-y-1">
+                                <!-- Doctor Image -->
+                                <div class="text-center mb-6">
+                                    <div class="relative inline-block">
+                                        <img src="{{ asset('images/dr-murphy.jpg') }}" alt="{{ $doctor->name }}"
+                                            class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-[#166FC1]/20 group-hover:border-[#166FC1]/50 transition-all duration-300">
+                                        <div class="absolute -bottom-2 -right-2 bg-[#166FC1] rounded-full p-2">
+                                            <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Doctor Info -->
+                                <div class="text-center space-y-3">
+                                    <h3
+                                        class="text-lg font-semibold text-gray-800 font-poppins group-hover:text-[#166FC1] transition-colors">
+                                        {{ $doctor->name }}
+                                    </h3>
+                                    <p
+                                        class="text-[#166FC1] font-medium text-sm bg-blue-50 px-3 py-1 rounded-full inline-block">
+                                        {{ $doctor->specialty }}
+                                    </p>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="mt-6">
+                                    <div
+                                        class="bg-[#166FC1] text-white text-center py-3 rounded-xl font-semibold group-hover:bg-blue-700 transition-all duration-300 flex items-center justify-center space-x-2">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>Book Appointment</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </x-layouts.main>

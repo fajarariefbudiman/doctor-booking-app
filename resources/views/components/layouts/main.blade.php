@@ -12,6 +12,7 @@
 
     {{-- Tailwind CSS (compiled) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Sedan+SC&display=swap"
         rel="stylesheet">
 

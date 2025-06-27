@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\UpdateBookingRequest;
 use App\Models\Doctor;
 use App\Models\Schedule;
@@ -20,12 +19,13 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Booking::with('doctor')
+        $bookings = Booking::with(['doctor', 'schedule'])
             ->where('user_id', Auth::id())
-            ->orderBy('booking_time', 'asc')
+            ->orderByDesc('created_at')
             ->get()
             ->groupBy(function ($booking) {
-                return \Carbon\Carbon::parse($booking->booking_time)->isFuture() ? 'upcoming' : 'past';
+                $scheduleDateTime = Carbon::parse($booking->schedule->schedule_time);
+                return $scheduleDateTime->isFuture() ? 'upcoming' : 'past';
             });
 
         return view('booking-schedule', [
@@ -33,6 +33,7 @@ class BookingController extends Controller
             'pastBookings' => $bookings->get('past', collect()),
         ]);
     }
+
 
 
     /**
@@ -71,7 +72,6 @@ class BookingController extends Controller
 
             DB::transaction(function () use ($scheduleDate, $scheduleTime, $userId, $doctorId, $request) {
 
-                // Cek existing booking user
                 $existingUserBooking = Booking::join('schedules', 'bookings.schedule_id', '=', 'schedules.id')
                     ->where('bookings.user_id', $userId)
                     ->where('schedules.doctor_id', $doctorId)
@@ -83,7 +83,6 @@ class BookingController extends Controller
                     throw new \Exception('Anda sudah membooking jadwal ini sebelumnya.');
                 }
 
-                // Lock dan cari schedule
                 $schedule = Schedule::lockForUpdate()
                     ->where('doctor_id', $doctorId)
                     ->where('schedule_date', $scheduleDate)
@@ -91,7 +90,6 @@ class BookingController extends Controller
                     ->first();
 
                 if (!$schedule) {
-                    // Buat schedule baru
                     $schedule = Schedule::create([
                         'doctor_id' => $doctorId,
                         'schedule_date' => $scheduleDate,
@@ -105,7 +103,6 @@ class BookingController extends Controller
                     $schedule->update(['is_available' => false]);
                 }
 
-                // Buat booking
                 Booking::create([
                     'user_id' => $userId,
                     'doctor_id' => $doctorId,
@@ -114,11 +111,10 @@ class BookingController extends Controller
                 ]);
             });
 
-            $doctorName = $doctor->name; // Asumsi kolom nama dokter adalah 'name'
-            $bookingDate = Carbon::parse($request->schedule_date)->format('F d'); // Contoh: September 10
-            $bookingTime = Carbon::parse($request->schedule_time)->format('h A'); // Contoh: 11 AM
+            $doctorName = $doctor->name;
+            $bookingDate = Carbon::parse($request->schedule_date)->format('F d');
+            $bookingTime = Carbon::parse($request->schedule_time)->format('h A');
 
-            // Simpan data ke sesi flash untuk digunakan setelah redirect
             session()->flash('booking_success_data', [
                 'doctorName' => $doctorName,
                 'bookingDate' => $bookingDate,
@@ -127,7 +123,6 @@ class BookingController extends Controller
 
             return redirect()->route('booking.success')->with('success', 'Booking berhasil dibuat!');
         } catch (\Illuminate\Database\QueryException $e) {
-            // Handle database constraint violations
             if (str_contains($e->getMessage(), 'unique_doctor_schedule')) {
                 Log::warning('Duplicate schedule creation attempted', [
                     'user_id' => Auth::id(),
