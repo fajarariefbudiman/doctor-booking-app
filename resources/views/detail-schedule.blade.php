@@ -59,8 +59,8 @@
             <!-- Informasi Booking Terpilih -->
             <div id="booking-info" class="pt-6 hidden">
                 <div class="text-sm text-gray-700 mb-2">
-                    <p><span class="font-semibold">Tanggal:</span> <span id="selected-date"></span></p>
-                    <p><span class="font-semibold">Waktu:</span> <span id="selected-time"></span></p>
+                    <p><span class="font-semibold">Date:</span> <span id="selected-date"></span></p>
+                    <p><span class="font-semibold">Time:</span> <span id="selected-time"></span></p>
                 </div>
 
                 <form action="{{ route('bookings.store') }}" method="POST">
@@ -294,7 +294,7 @@
                 console.log('Time:', time);
 
                 document.getElementById('selected-date').textContent = date;
-                document.getElementById('selected-time').textContent = time;
+                document.getElementById('selected-time').textContent = '';
 
                 document.getElementById('form-date').value = isoDate;
                 document.getElementById('form-time').value = time;
@@ -338,7 +338,7 @@
                 clickedButton.classList.add('bg-[#236EB3]', 'text-white', 'border-[#236EB3]');
 
                 document.getElementById('selected-date-desktop').textContent = date;
-                document.getElementById('selected-time-desktop').textContent = time;
+                document.getElementById('selected-time-desktop').textContent = '';
 
                 document.getElementById('form-date-desktop').value = isoDate;
                 document.getElementById('form-time-desktop').value = time;
